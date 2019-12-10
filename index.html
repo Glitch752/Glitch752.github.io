@@ -1,41 +1,66 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Codin' bros</title>
-        <link rel="icon" type="image/x-icon" href="favicon.ico">
-        <meta name="google-site-verification" content="t6RrB63FoRyKiXsX24poq2ECcbepLhN7_CEmCA7WbBw" />
+        <title>Games</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
-    <header>
-            <h1 class="title" >Codi'n bros</h1>
-            <h5>this is a fun website in progress</h5>
-    </header>
     <body>
-            <div>
-                <button onclick="window.location.href = '/usefullstuff';">Usefull stuff</button>
-                <button onclick="window.location.href = '/thewebsite';">The website</button>
-                <button onclick="window.location.href = '/fun';" >Fun</button>
-            </div>
         <style>
             * {
                 box-sizing: border-box;
             }
             body {
-              display: wrap;
-              margin: 0px;
-              flex: 70%;
-              display: flex;
-              background-color: lightgrey;
+                margin: 0;
             }
-            .title {
-              flex-wrap: wrap;
-              display: flex;
-              color: white;
-              text-align: center;
+            .header {
+                padding: 80px;
+                text-align: center;
+                background: #1abc9c;
+                color: white;
             }
-            header {
-             padding: 80px;
-             background-color: #1abc9c;
+            .header h1 {
+                font-size: 40px;
+            }
+            a {
+                color: black;
+                text-decoration: none;
+            }
+            a:hover {
+                color: #323333;
+                text-decoration: underline;
+            }
+            .row {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .side {
+                flex: 30%
+                margin: 0;
+                padding: 5px;
+                background-color: #f1f1f1;
+                height: 100vh;
+            }
+            .sidebarlinks {
+            }
+            .main {
+                flex: 70%;
+                text-align: center;
+                background-color: white;
             }
         </style>
+        <div class="header">
+            <h1>Games</h1>
+            <p>A collection of games.</p>
+        </div>
+        <div class="row">
+            <div class="side">
+                <a class="sidebarlinks" href="Cube-engine-master/play.htm">Cube Engine</a>
+                <br>
+                <a class="sidebarlinks" href="mariohtml5-master/main.html">Mariohtml5</a>
+            </div>
+            <div class="main">
+                <p>Welcome to the Chromebook: Game selection! A complete list of games are on the side bar! If you are interested in learning more about how this collection came to be, read on!</p>
+            </div>
+        </div>
     </body>
 </html>
