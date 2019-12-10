@@ -7,6 +7,12 @@
 
 <h1>Who are we?</h1>
 <p>We are a group that loves coding on many platforms such as github,scratch.mit.edu, and codepen.io. we like having fun and we like to have lots of meetings each month so  </p>
-
+<style>body {
+  background-color Dodgerblue ;
+}
+p {
+  color: Golden Rod;
+}
+</style>
 </body>
 </html>
