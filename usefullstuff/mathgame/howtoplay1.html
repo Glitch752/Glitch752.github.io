@@ -12,9 +12,9 @@ var ctx = null;
 if(gameMapID==1) {
 	var gameMap = [
 		0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-		0, 2, 2, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-		0, 1, 1, 2, 1, 0, 0, 0, 0, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+		0, 2, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+		0, 2, 2, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+		0, 1, 2, 2, 1, 0, 0, 0, 0, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
 		0, 1, 1, 2, 1, 0, 2, 2, 0, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
 		0, 1, 1, 2, 1, 0, 2, 2, 0, 4, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
 		0, 1, 1, 2, 2, 2, 2, 2, 0, 4, 4, 4, 1, 1, 1, 0, 2, 2, 2, 0,
@@ -173,6 +173,15 @@ var tileW = 40, tileH = 40;
 var currentSecond = 0, frameCount = 0, framesLastSecond = 0, lastFrameTime = 0;
 
 var tileset = null, tilesetURL = "tileset.png", tilesetLoaded = false;
+
+var messagepopup = 0;
+var currentquest = 0;
+
+var quests = [
+	{name:"Talk to Jerry", diff:"Easy", hint:"stand in front of him to talk", desc:"Go to Jerry. He looks like you."},
+	{name:"Go to the castle", diff:"Easy", hint:"follow the path", desc:"Go to the castle, where the evil king is."},
+	{name:"Defeat the evil king", diff:"Hard", hint:"Use your math skills to defat him", desc:"Defeat the evil king in the castle."}
+];
 
 var gameTime = 0;
 var gameSpeeds = [
@@ -690,6 +699,7 @@ window.onload = function()
 	ctx.font = "bold 10pt sans-serif";
 
 	window.addEventListener("keydown", function(e) {
+        messagepopup = 0;
 		if(e.keyCode>=37 && e.keyCode<=40) { keysDown[e.keyCode] = true; }
 		if(e.keyCode==80) { keysDown[e.keyCode] = true; }
 	});
@@ -716,13 +726,16 @@ window.onload = function()
 	
 	mapTileData.buildMapFromData(gameMap, mapW, mapH);
 	mapTileData.addRoofs(roofList);
-	
-	mapTileData.map[((2*mapW)+2)].eventEnter = function()
-		{ console.log("Entered tile 2,2"); };
+
+    mapTileData.map[((2*mapW)+2)].eventEnter = function()
+		{ 
+        messagepopup = 1;
+        };
+    ///////////////////////////////////////////////////////////////////////////////////////////ENTER TILES WITH PEOPLE///////////////////
 	
 	if(gameMapID==1) {
-		var mo1 = new MapObject(1); mo1.placeAt(2, 4);
-		var mo2 = new MapObject(2); mo2.placeAt(2, 3);
+		var mo1 = new MapObject(1); mo1.placeAt(1, 4);
+		var mo2 = new MapObject(2); mo2.placeAt(1, 3);
 		
 		var mo11 = new MapObject(1); mo11.placeAt(6, 4);
 		var mo12 = new MapObject(2); mo12.placeAt(7, 4);
@@ -781,7 +794,7 @@ function drawGame()
 	var playerRoof2 = mapTileData.map[toIndex(
 		player.tileTo[0], player.tileTo[1])].roof;
 
-	ctx.fillStyle = "#000000";
+	ctx.fillStyle = "#8bae6e";
 	ctx.fillRect(0, 0, viewport.screen[0], viewport.screen[1]);
 	
 	for(var z = 0; z < mapTileData.levels; z++)
@@ -796,7 +809,7 @@ function drawGame()
 				tileTypes[mapTileData.map[toIndex(x,y)].type].sprite.draw(
 					gameTime,
 					viewport.offset[0] + (x*tileW),
-					viewport.offset[1] + (y*tileH));
+					viewport.offset[1] + (y*tileH)); //-------------------------------------------------DRAW TILES ON MAP CODE-----------------
 			}
 			else if(z==1)
 			{
@@ -839,7 +852,31 @@ function drawGame()
 				gameTime,
 				viewport.offset[0] + player.position[0],
 				viewport.offset[1] + player.position[1]);
+			player.sprites[3].draw(
+				gameTime,
+				viewport.offset[0] + (3*tileW) + ((tileW/2)-(player.dimensions[0]/2)),
+				viewport.offset[1] + (2*tileH) + ((tileH/2)-(player.dimensions[1]/2)));
 		}
+
+        if(z==3) {
+                //////////////////////////////////////////////////////////////////////////////////DRAW TEXT BOXES//////////////////////
+                if(messagepopup==1) {
+					if(currentquest==0) {
+						currentquest = 1;
+					}
+					ctx.fillStyle = "#cccccc";
+					ctx.font = "15px Arial";
+                    ctx.fillRect(viewport.offset[0] + 150,viewport.offset[1] + 60,145,70);
+                    ctx.fillStyle = "#ff0000";
+                    var txt = 'Hello, adventurer! \nCan you help me \ndefeat the evil king? \nYou look very strong!';
+                    var textlineheight = 15;
+                    var textlines = txt.split('\n');
+
+                    for (var i = 0; i < textlines.length; i++) {
+                        ctx.fillText(textlines[i], viewport.offset[0] + 157, viewport.offset[1] + 75 + (i*textlineheight) );
+                    }
+                }
+        }
 	
 	}
 	
@@ -871,8 +908,16 @@ function drawGame()
 	ctx.textAlign = "left";
 
 	ctx.fillStyle = "#ff0000";
+	ctx.font = "12px Arial";
 	ctx.fillText("FPS: " + framesLastSecond, 10, 20);
 	ctx.fillText("Game speed: " + gameSpeeds[currentSpeed].name, 10, 40);
+	ctx.fillStyle = "#ddccaa";
+	ctx.fillRect(150,5,viewport.screen[0] - (5+150), (10+30));
+	ctx.fillStyle = "#ff0000";
+	ctx.font = "10px Arial";
+	ctx.fillText("Current Quest: " + quests[currentquest].name, 155, 15);
+	ctx.fillText("Difficulty: " + quests[currentquest].diff, 155, 27);
+	ctx.fillText("Description: " + quests[currentquest].desc, 155, 39);
 
 	lastFrameTime = currentFrameTime;
 	requestAnimationFrame(drawGame);
