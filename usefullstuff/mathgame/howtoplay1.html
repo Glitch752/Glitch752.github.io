@@ -176,10 +176,14 @@ var tileset = null, tilesetURL = "tileset.png", tilesetLoaded = false;
 
 var messagepopup = 0;
 var currentquest = 0;
+var canmove = 1;
+var windowx = 150;
+var windowy = 60;
 
 var quests = [
 	{name:"Talk to Jerry", diff:"Easy", hint:"stand in front of him to talk", desc:"Go to Jerry. He looks like you."},
 	{name:"Go to the castle", diff:"Easy", hint:"follow the path", desc:"Go to the castle, where the evil king is."},
+	{name:"Defeat the castle gaurd", diff:"Medium", hint:"Use your math skills to defat him", desc:"Defeat the castle gaurd by the door."},
 	{name:"Defeat the evil king", diff:"Hard", hint:"Use your math skills to defat him", desc:"Defeat the evil king in the castle."}
 ];
 
@@ -573,7 +577,7 @@ Character.prototype.processMovement = function(t)
 		if(mapTileData.map[toIndex(this.tileTo[0], this.tileTo[1])].eventEnter!=null)
 		{
 			mapTileData.map[toIndex(this.tileTo[0], this.tileTo[1])].eventEnter(this);
-		}
+		}//------------------------------------------------------------------------------------------------------EVENT ENTER------------
 
 		var tileFloor = tileTypes[mapTileData.map[toIndex(this.tileFrom[0], this.tileFrom[1])].type].floor;
 
@@ -691,6 +695,8 @@ function toIndex(x, y)
 	return((y * mapW) + x);
 }
 
+
+//WINDOW.ONLOAD START
 window.onload = function()
 {
 
@@ -700,15 +706,17 @@ window.onload = function()
 
 	window.addEventListener("keydown", function(e) {
         messagepopup = 0;
-		if(e.keyCode>=37 && e.keyCode<=40) { keysDown[e.keyCode] = true; }
-		if(e.keyCode==80) { keysDown[e.keyCode] = true; }
+		if(canmove==1) {
+			if(e.keyCode>=37 && e.keyCode<=40) { keysDown[e.keyCode] = true; }
+			if(e.keyCode==80) { keysDown[e.keyCode] = true; }
+		}
 	});
 	window.addEventListener("keyup", function(e) {
-		if(e.keyCode>=37 && e.keyCode<=40) { keysDown[e.keyCode] = false; }
-		if(e.keyCode==83)
-		{
-			currentSpeed = (currentSpeed>=(gameSpeeds.length-1) ? 0 : currentSpeed+1);
-		}
+		if(e.keyCode>=37 && e.keyCode<=40 || canmove==0) { keysDown[e.keyCode] = false; }
+			if(e.keyCode==83)
+			{
+				currentSpeed = (currentSpeed>=(gameSpeeds.length-1) ? 0 : currentSpeed+1);
+			}
 		if(e.keyCode==80) { keysDown[e.keyCode] = false; }
 	});
 
@@ -730,6 +738,11 @@ window.onload = function()
     mapTileData.map[((2*mapW)+2)].eventEnter = function()
 		{ 
         messagepopup = 1;
+        };
+	mapTileData.map[((12*mapW)+14)].eventEnter = function()
+		{ 
+        currentquest = 2;
+		canmove = 0;
         };
     ///////////////////////////////////////////////////////////////////////////////////////////ENTER TILES WITH PEOPLE///////////////////
 	
@@ -758,6 +771,8 @@ window.onload = function()
 		}
 	}
 };
+
+/////WINDOW.ONLOAD END
 
 function drawGame()
 {
@@ -856,6 +871,10 @@ function drawGame()
 				gameTime,
 				viewport.offset[0] + (3*tileW) + ((tileW/2)-(player.dimensions[0]/2)),
 				viewport.offset[1] + (2*tileH) + ((tileH/2)-(player.dimensions[1]/2)));
+			player.sprites[3].draw(
+				gameTime,
+				viewport.offset[0] + (16*tileW) + ((tileW/2)-(player.dimensions[0]/2)),
+				viewport.offset[1] + (12*tileH) + ((tileH/2)-(player.dimensions[1]/2)));
 		}
 
         if(z==3) {
@@ -974,6 +993,7 @@ arrow keys - move
 <br>
 P - pick up item
 </p>
+<textarea placeholder="difficulty" rows="1" cols="10"></textarea>
 
 </body>
 </html>
