@@ -170,15 +170,35 @@ if(gameMapID==1) {
 }
 
 var tileW = 40, tileH = 40;
-var currentSecond = 0, frameCount = 0, framesLastSecond = 0, lastFrameTime = 0;
+var currentSecond = 0, frameCount = 0, framesLastSecond = 0, lastFrameTime = 0, lastSec = 0;
 
 var tileset = null, tilesetURL = "tileset.png", tilesetLoaded = false;
 
 var messagepopup = 0;
+var questionpopup = 0;
+var fightpopup = 0;
+
+var number = "";
+
+var mathnum1 = 0;
+var mathnum2 = 0;
+let topNumber = 0;
+let bottomNumber = 0;
+
 var currentquest = 0;
 var canmove = 1;
-var windowx = 150;
-var windowy = 60;
+
+var windowx = 250;
+var windowy = 160;
+var txt = 'Hello, adventurer! \nCan you help me \ndefeat the evil king? \nYou look very strong!';
+
+var questionx = 150;
+var questiony = 250;
+var txt2 = 'Try to defeat the \n guard? \n-----------------------\n    [y] / [n]';
+
+var fightx = 150;
+var fighty = 250;
+var txt3 = '293 + 18 = ';
 
 var quests = [
 	{name:"Talk to Jerry", diff:"Easy", hint:"stand in front of him to talk", desc:"Go to Jerry. He looks like you."},
@@ -371,10 +391,10 @@ MapObject.prototype.placeAt = function(nx, ny)
 };
 
 var floorTypes = {
-	solid	: 0,
-	path	: 1,
-	water	: 2,
-	ice		: 3,
+	solid	    : 0,
+	path	    : 1,
+	water	    : 2,
+	ice		    : 3,
 	conveyorU	: 4,
 	conveyorD	: 5,
 	conveyorL	: 6,
@@ -497,11 +517,14 @@ var directions = {
 };
 
 var keysDown = {
+	13 : false,
 	37 : false,
 	38 : false,
 	39 : false,
 	40 : false,
-	80 : false
+	78 : false,
+	80 : false,
+	89 : false
 };
 
 var viewport = {
@@ -705,19 +728,36 @@ window.onload = function()
 	ctx.font = "bold 10pt sans-serif";
 
 	window.addEventListener("keydown", function(e) {
-        messagepopup = 0;
 		if(canmove==1) {
-			if(e.keyCode>=37 && e.keyCode<=40) { keysDown[e.keyCode] = true; }
-			if(e.keyCode==80) { keysDown[e.keyCode] = true; }
+        	messagepopup = 0;
+			if(e.keyCode>=37 && e.keyCode<=40) { keysDown[e.keyCode] = true; } //arrows
+			if(e.keyCode==80) { keysDown[e.keyCode] = true; } //p
 		}
+		if(e.keyCode>=48 && e.keyCode<=57 && (fightpopup==1 || fightpopup==2)) { 
+			txt3 = txt3 + e.key;
+			number = number + e.key;
+		}
+		if(e.keyCode==8 && (fightpopup==1 || fightpopup==2)) { 
+			txt3 = txt3.substring(0, txt3.length - 1); 
+			number = number.substring(0, number.length - 1); 
+		}
+		// --y/n--
+		if(e.keyCode==89) { keysDown[e.keyCode] = true; } //y
+		if(e.keyCode==78) { keysDown[e.keyCode] = true; }//n
+		if(e.keyCode==13) { keysDown[e.keyCode] = true; }//enter
 	});
 	window.addEventListener("keyup", function(e) {
 		if(e.keyCode>=37 && e.keyCode<=40 || canmove==0) { keysDown[e.keyCode] = false; }
-			if(e.keyCode==83)
+			if(e.keyCode==83) //s
 			{
 				currentSpeed = (currentSpeed>=(gameSpeeds.length-1) ? 0 : currentSpeed+1);
 			}
-		if(e.keyCode==80) { keysDown[e.keyCode] = false; }
+		if(e.keyCode==80) { keysDown[e.keyCode] = false; }//s
+
+		// --y/n--
+		if(e.keyCode==89) { keysDown[e.keyCode] = false; } //y
+		if(e.keyCode==78) { keysDown[e.keyCode] = false; }//n
+		if(e.keyCode==13) { keysDown[e.keyCode] = false; }//enter
 	});
 
 	viewport.screen = [document.getElementById('game').width,
@@ -737,12 +777,19 @@ window.onload = function()
 
     mapTileData.map[((2*mapW)+2)].eventEnter = function()
 		{ 
-        messagepopup = 1;
+			messagepopup = 1;
         };
 	mapTileData.map[((12*mapW)+14)].eventEnter = function()
 		{ 
-        currentquest = 2;
-		canmove = 0;
+			if(currentquest==1) {
+				currentquest = 2;
+				canmove = 0;
+				txt = "You can't get to the \nking! If you want to, \nyou'll have to get \npast ME!";
+				windowx = 150;
+				windowy = 80;
+				messagepopup = 1;
+				questionpopup = 1;
+			}
         };
     ///////////////////////////////////////////////////////////////////////////////////////////ENTER TILES WITH PEOPLE///////////////////
 	
@@ -784,21 +831,31 @@ function drawGame()
 	gameTime+= Math.floor(timeElapsed * gameSpeeds[currentSpeed].mult);
 
 	var sec = Math.floor(Date.now()/1000);
-	if(sec!=currentSecond)
-	{
+	if(sec!=currentSecond) {
 		currentSecond = sec;
 		framesLastSecond = frameCount;
 		frameCount = 1;
 	}
 	else { frameCount++; }
 
-	if(!player.processMovement(gameTime) && gameSpeeds[currentSpeed].mult!=0)
-	{
+	if(!player.processMovement(gameTime) && gameSpeeds[currentSpeed].mult!=0) {
 		if(keysDown[38] && player.canMoveUp())			{ player.moveUp(gameTime); }
 		else if(keysDown[40] && player.canMoveDown())	{ player.moveDown(gameTime); }
 		else if(keysDown[37] && player.canMoveLeft())	{ player.moveLeft(gameTime); }
 		else if(keysDown[39] && player.canMoveRight())	{ player.moveRight(gameTime); }
 		else if(keysDown[80]) { player.pickUp(); }
+	}
+
+	if(questionpopup==1) {
+		if(keysDown[89]) {
+			questionpopup = 0;
+			messagepopup = 0;
+			fightpopup = 1;
+		} else if (keysDown[78]) {
+			player.moveLeft(gameTime);
+			questionpopup = 0;
+			messagepopup = 0;
+		}
 	}
 
 	viewport.update(player.position[0] + (player.dimensions[0]/2),
@@ -885,14 +942,62 @@ function drawGame()
 					}
 					ctx.fillStyle = "#cccccc";
 					ctx.font = "15px Arial";
-                    ctx.fillRect(viewport.offset[0] + 150,viewport.offset[1] + 60,145,70);
+                    ctx.fillRect(windowx,windowy,145,70); //in the start, windowx = 250, and windowy = 160.
                     ctx.fillStyle = "#ff0000";
-                    var txt = 'Hello, adventurer! \nCan you help me \ndefeat the evil king? \nYou look very strong!';
                     var textlineheight = 15;
                     var textlines = txt.split('\n');
 
                     for (var i = 0; i < textlines.length; i++) {
-                        ctx.fillText(textlines[i], viewport.offset[0] + 157, viewport.offset[1] + 75 + (i*textlineheight) );
+                        ctx.fillText(textlines[i], (windowx + 7), (windowy + 15) + (i*textlineheight) );
+                    }
+                }
+				if(questionpopup==1) {
+					ctx.fillStyle = "#cccccc";
+                    ctx.fillRect(questionx,questiony,145,70);
+                    ctx.fillStyle = "#ff0000";
+                    var text2lineheight = 15;
+                    var text2lines = txt2.split('\n');
+
+                    for (var i = 0; i < text2lines.length; i++)
+					{
+                        ctx.fillText(text2lines[i], (questionx + 7), (questiony + 15) + (i*text2lineheight) );
+                    }
+                }
+				if(fightpopup==1 || fightpopup==2) 
+				{
+					ctx.fillStyle = "#cccccc";
+                    ctx.fillRect(fightx,fighty,145,70);
+					if(fightpopup==1) 
+					{
+						fightpopup = 2;
+						timeWidth = 135;
+						difficultyvalue = document.getElementById("difficultybox").value;
+						operationvalue = document.getElementById("operation").value;
+						if (operationvalue)
+						mathnum1 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
+						mathnum2 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
+						txt3 = mathnum1 + operationvalue + mathnum2 + "=";
+					}
+					if(sec != lastSec) 
+					{
+						lastSec = Math.floor(sec);
+						timeWidth -= 2.25;
+					}
+					if (keysDown[13]) {
+						if(CheckMath(mathnum1,operationvalue,mathnum2,number)) {
+							fightpopup = 1;
+						} else {
+							fightpopup = 0;
+						}
+					}
+					ctx.fillStyle = "#008000";
+					ctx.fillRect(fightx + 5,fighty + 25,timeWidth, 20)
+                    ctx.fillStyle = "#ff0000";
+                    var text3lineheight = 15;
+                    var text3lines = txt3.split('\n');
+
+                    for (var i = 0; i < text3lines.length; i++) {
+                        ctx.fillText(text3lines[i], (fightx + 7), (fighty + 15) + (i*text3lineheight) );
                     }
                 }
         }
@@ -946,6 +1051,50 @@ function fullscreenview(){
 	$("#game")[0].webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT); //Chrome
 	$("#game")[0].mozRequestFullScreen(); //Firefox
 }
+function randomNumber(min, max) {  
+    return Math.random() * (max - min) + min; 
+} 
+function CheckMath(num1,operationn,num2,valuein) {
+	console.log(operationn);
+	if(operationn = "+") {
+		if(num1 + num2 == valuein) {
+			return true;
+		} else {
+			return false;
+		}
+	} else if(operationn = "-") {
+		if(num1 - num2 == valuein) {
+			return true;
+		} else {
+			return false;
+		}
+	} else if(operationn = "/") {
+		if(num1 / num2 == valuein) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		if(num1 * num2 == valuein) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+function generateTop(max, min, a){
+  
+  topNumber = a * Math.floor(Math.random() * (max - min) + min);
+  return topNumber + "/" + a;
+  
+};
+
+function generateBottom(max, min){
+  
+  bottomNumber = Math.floor(Math.random() * (max - min) + min);
+  return bottomNumber;
+  
+};
 </script>
 
 <style>
@@ -993,7 +1142,16 @@ arrow keys - move
 <br>
 P - pick up item
 </p>
-<textarea placeholder="difficulty" rows="1" cols="10"></textarea>
+<p for="difficultybox">difficulty:</p>
+<textarea rows="1" cols="10" id="difficultybox">1</textarea>
+<br>
+<select id="operation">
+	<option value="+">Addition</option>
+	<option value="-">Subtraction</option>
+	<option value="/">division</option>
+	<option value="*">multiplication</option>
+	<!-- <option value="all">all</option> -->
+</select>
 
 </body>
 </html>
