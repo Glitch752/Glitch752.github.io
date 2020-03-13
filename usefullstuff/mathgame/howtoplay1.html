@@ -972,11 +972,15 @@ function drawGame()
 						fightpopup = 2;
 						timeWidth = 135;
 						difficultyvalue = document.getElementById("difficultybox").value;
-						operationvalue = document.getElementById("operation").value;
-						if (operationvalue)
-						mathnum1 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
-						mathnum2 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
-						txt3 = mathnum1 + operationvalue + mathnum2 + "=";
+					    operationvalue = document.getElementById("operation").value;
+						if (operationvalue == "+") {
+						  mathnum1 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
+						  mathnum2 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
+						  txt3 = mathnum1 + operationvalue + mathnum2 + "=";
+                        }
+                        if (operationvalue == "/") {
+						  txt3 = generateTop(10,20,generateBottom(10,30));
+                        }
 					}
 					if(sec != lastSec) 
 					{
