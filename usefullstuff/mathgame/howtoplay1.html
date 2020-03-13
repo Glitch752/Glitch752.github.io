@@ -179,6 +179,7 @@ var questionpopup = 0;
 var fightpopup = 0;
 
 var number = "";
+var incorrect = 0;
 
 var mathnum1 = 0;
 var mathnum2 = 0;
@@ -976,10 +977,17 @@ function drawGame()
 						if (operationvalue == "+") {
 						  mathnum1 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
 						  mathnum2 = Math.floor(randomNumber((difficultyvalue + 1) * 5,(difficultyvalue + 5) * 5));
-						  txt3 = mathnum1 + operationvalue + mathnum2 + "=";
-                        }
-                        if (operationvalue == "/") {
+						  txt3 = mathnum1 + "+" + mathnum2 + "=";
+                        } else if (operationvalue == "/") {
 						  txt3 = generateTop(10,20,generateBottom(10,30));
+                        } else if (operationvalue == "*") {
+						  mathnum1 = Math.floor(randomNumber((difficultyvalue + 1) * 3,(difficultyvalue + 5) * 3));
+						  mathnum2 = Math.floor(randomNumber((difficultyvalue + 1) * 3,(difficultyvalue + 5) * 3));
+						  txt3 = mathnum1 + "x" + mathnum2 + "=";
+                        } else if (operationvalue == "-") {
+						  mathnum1 = Math.floor(randomNumber((difficultyvalue + 1) * 3,(difficultyvalue + 5) * 3));
+						  mathnum2 = Math.floor(randomNumber((difficultyvalue + 1) * 2,mathnum1 - 5));
+						  txt3 = mathnum1 + "-" + mathnum2 + "=";
                         }
 					}
 					if(sec != lastSec) 
@@ -990,8 +998,6 @@ function drawGame()
 					if (keysDown[13]) {
 						if(CheckMath(mathnum1,operationvalue,mathnum2,number)) {
 							fightpopup = 1;
-						} else {
-							fightpopup = 0;
 						}
 					}
 					ctx.fillStyle = "#008000";
@@ -1066,7 +1072,8 @@ function CheckMath(num1,operationn,num2,valuein) {
 		} else {
 			return false;
 		}
-	} else if(operationn = "-") {
+    }
+    /* else if(operationn = "-") {
 		if(num1 - num2 == valuein) {
 			return true;
 		} else {
@@ -1084,7 +1091,7 @@ function CheckMath(num1,operationn,num2,valuein) {
 		} else {
 			return false;
 		}
-	}
+	}*/
 }
 function generateTop(max, min, a){
   
